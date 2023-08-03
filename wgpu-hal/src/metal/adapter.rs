@@ -773,9 +773,10 @@ impl super::PrivateCapabilities {
             } else {
                 None
             },
-            support_timestamp_query: version.at_least((11, 0), (14, 0), os_is_mac)
+            support_timestamp_query: version.at_least((12, 0), (11, 0), os_is_mac)
                 && device
                     .supports_counter_sampling(metal::MTLCounterSamplingPoint::AtStageBoundary),
+            blend_func_extended: version.at_least((11, 0), (14, 0), os_is_mac),
             support_timestamp_query_in_passes: version.at_least((11, 0), (14, 0), os_is_mac)
                 && device.supports_counter_sampling(metal::MTLCounterSamplingPoint::AtDrawBoundary)
                 && device
@@ -807,6 +808,7 @@ impl super::PrivateCapabilities {
             | F::DEPTH32FLOAT_STENCIL8
             | F::MULTI_DRAW_INDIRECT;
 
+        features.set(F::BLEND_FUNC_EXTENDED , self.blend_func_extended);
         features.set(F::TIMESTAMP_QUERY, self.support_timestamp_query);
         // TODO: Not yet implemented.
         // features.set(

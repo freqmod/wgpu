@@ -782,7 +782,20 @@ bitflags::bitflags! {
         /// This is a native only feature.
         const SHADER_EARLY_DEPTH_TEST = 1 << 62;
 
-        // 62..64 available
+        /// Allows two outputs from a shader to be used by blending
+        /// For more info see the OpenGL extension ARB_blend_func_extended
+        ///
+        /// Supported platforms:
+        /// - OpenGL (with ARB_blend_func_extended)
+        /// - Metal
+        /// - Vulkan (with ARB_blend_func_extended)
+        /// TBD:
+        /// - DX11 / DX 12
+        ///
+        /// This is a native only feature.
+        const BLEND_FUNC_EXTENDED = 1 << 63;
+
+        // 63..64 available
     }
 }
 
@@ -1550,6 +1563,8 @@ impl TextureViewDimension {
 ///
 /// Corresponds to [WebGPU `GPUBlendFactor`](
 /// https://gpuweb.github.io/gpuweb/#enumdef-gpublendfactor).
+/// For the extended values see the OpenGL extension
+/// [ARB blend func extended][https://registry.khronos.org/OpenGL/extensions/ARB/ARB_blend_func_extended.txt]
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "trace", derive(Serialize))]
@@ -1582,6 +1597,14 @@ pub enum BlendFactor {
     Constant = 11,
     /// 1.0 - Constant
     OneMinusConstant = 12,
+    /// Extension: Dual buffer alternate buffer, 1.0 - S.component
+    Src1 = 13,
+    /// Extension: Dual buffer alternate buffer, S.Component 
+    OneMinusSrc1 = 14,
+    /// Extension: Dual buffer alternate buffer, S.alpha
+    Src1Alpha = 15,
+    /// Extension: Dual buffer alternate buffer, 1.0 - S.alpha
+    OneMinusSrc1Alpha = 16,
 }
 
 /// Alpha blend operation.

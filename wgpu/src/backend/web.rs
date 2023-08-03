@@ -421,6 +421,12 @@ fn map_blend_factor(factor: wgt::BlendFactor) -> web_sys::GpuBlendFactor {
         BlendFactor::SrcAlphaSaturated => bf::SrcAlphaSaturated,
         BlendFactor::Constant => bf::Constant,
         BlendFactor::OneMinusConstant => bf::OneMinusConstant,
+        // Extended blend types are converted to their normal counterparts on web where they are not supported.
+        // TODO: Consider panicking here
+        BlendFactor::Src1 => bf::Src,
+        BlendFactor::OneMinusSrc1 => bf::OneMinusSrc,
+        BlendFactor::Src1Alpha => bf::SrcAlpha,
+        BlendFactor::OneMinusSrc1Alpha => bf::OneMinusSrcAlpha,
     }
 }
 

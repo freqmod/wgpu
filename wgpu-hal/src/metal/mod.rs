@@ -241,6 +241,7 @@ struct PrivateCapabilities {
     has_unified_memory: Option<bool>,
     support_timestamp_query: bool,
     support_timestamp_query_in_passes: bool,
+    blend_func_extended: bool,
 }
 
 #[derive(Clone, Debug)]
