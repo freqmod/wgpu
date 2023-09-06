@@ -51,7 +51,7 @@ version = "0.17"
 
 [workspace.dependencies.naga]
 git = "https://github.com/gfx-rs/naga"
-rev = "7a19f3af909202c7eafd36633b5584bfbb353ecb"
+rev = "0491d39232bafc30962f6ea240ab6ed457282a62"
 version = "0.13.0"
 
 [workspace.dependencies]
@@ -145,7 +145,7 @@ tokio = "1.32.0"
 termcolor = "1.2.0"
 
 [patch."https://github.com/gfx-rs/naga"]
-naga = { path = "../naga" }
+#naga = { path = "../naga" }
 
 [patch."https://github.com/zakarumych/gpu-descriptor"]
 #gpu-descriptor = { path = "../gpu-descriptor/gpu-descriptor" }
@@ -154,7 +154,7 @@ naga = { path = "../naga" }
 #gpu-alloc = { path = "../gpu-alloc/gpu-alloc" }
 
 [patch.crates-io]
-naga = { path = "../naga" }
+#naga = { path = "../naga" }
 #glow = { path = "../glow" }
 #d3d12 = { path = "../d3d12-rs" }
 #metal = { path = "../metal-rs" }

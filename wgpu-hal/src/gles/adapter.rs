@@ -365,7 +365,7 @@ impl super::Adapter {
         );
 
         features.set(
-            wgt::Features::BLEND_FUNC_EXTENDED,
+            wgt::Features::DUAL_SOURCE_BLENDING,
             extensions.contains("GL_EXT_blend_func_extended"),
         );
         features.set(

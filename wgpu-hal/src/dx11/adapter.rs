@@ -146,7 +146,6 @@ impl super::Adapter {
             downlevel |= wgt::DownlevelFlags::INDIRECT_EXECUTION;
             downlevel |= wgt::DownlevelFlags::WEBGPU_TEXTURE_FORMAT_SUPPORT;
             features |= wgt::Features::TEXTURE_COMPRESSION_BC;
-            features |= wgt::Features::BLEND_FUNC_EXTENDED; // TODO: This may be the wrong level
         }
 
         if feature_level >= FL11_1 {

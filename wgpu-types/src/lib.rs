@@ -782,20 +782,19 @@ bitflags::bitflags! {
         /// This is a native only feature.
         const SHADER_EARLY_DEPTH_TEST = 1 << 62;
 
-        /// Allows two outputs from a shader to be used by blending
-        /// For more info see the OpenGL extension ARB_blend_func_extended
+        /// Allows two outputs from a shader to be used for blending.
+        /// Note that dual-source blending doesn't support multiple render targets.
+        ///
+        /// For more info see the OpenGL ES extension GL_EXT_blend_func_extended.
         ///
         /// Supported platforms:
-        /// - OpenGL (with ARB_blend_func_extended)
-        /// - Metal
-        /// - Vulkan (with ARB_blend_func_extended)
-        /// TBD:
-        /// - DX11 / DX 12
-        ///
-        /// This is a native only feature.
-        const BLEND_FUNC_EXTENDED = 1 << 63;
+        /// - OpenGL ES (with GL_EXT_blend_func_extended)
+        /// - Metal (with MSL 1.2+)
+        /// - Vulkan (with dualSrcBlend)
+        /// - DX12
+        const DUAL_SOURCE_BLENDING = 1 << 63;
 
-        // 63..64 available
+        // no more space left
     }
 }
 
@@ -1563,8 +1562,7 @@ impl TextureViewDimension {
 ///
 /// Corresponds to [WebGPU `GPUBlendFactor`](
 /// https://gpuweb.github.io/gpuweb/#enumdef-gpublendfactor).
-/// For the extended values see the OpenGL extension
-/// [ARB blend func extended][https://registry.khronos.org/OpenGL/extensions/ARB/ARB_blend_func_extended.txt]
+/// Values using S1 requires [`Features::DUAL_SOURCE_BLENDING`].
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "trace", derive(Serialize))]
@@ -1597,13 +1595,13 @@ pub enum BlendFactor {
     Constant = 11,
     /// 1.0 - Constant
     OneMinusConstant = 12,
-    /// Extension: Dual buffer alternate buffer, 1.0 - S.component
+    /// Dual buffer alternate buffer, S1.Component
     Src1 = 13,
-    /// Extension: Dual buffer alternate buffer, S.Component 
+    /// Dual buffer alternate buffer, 1.0 - S1.component
     OneMinusSrc1 = 14,
-    /// Extension: Dual buffer alternate buffer, S.alpha
+    /// Dual buffer alternate buffer, S1.alpha
     Src1Alpha = 15,
-    /// Extension: Dual buffer alternate buffer, 1.0 - S.alpha
+    /// Dual buffer alternate buffer, 1.0 - S1.alpha
     OneMinusSrc1Alpha = 16,
 }
 

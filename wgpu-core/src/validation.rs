@@ -812,7 +812,7 @@ impl Interface {
                 location,
                 interpolation,
                 sampling,
-                is_blend_src_1: _,
+                second_blend_source: _,
             }) => Varying::Local {
                 location,
                 iv: InterfaceVar {
