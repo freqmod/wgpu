@@ -2873,6 +2873,16 @@ impl<A: HalApi> Device<A> {
             for (i, output) in io.iter() {
                 match color_targets.get(*i as usize) {
                     Some(&Some(ref state)) => {
+                        let shader_module = desc.fragment.as_ref().and_then(|fragment| {
+                            shader_module_guard.get(fragment.stage.module).ok()
+                        });
+                        validation::check_target_blend_source(
+                            self,
+                            shader_module,
+                            &desc.fragment,
+                            state,
+                            *i,
+                        )?;
                         validation::check_texture_format(state.format, &output.ty).map_err(
                             |pipeline| {
                                 pipeline::CreateRenderPipelineError::ColorState(

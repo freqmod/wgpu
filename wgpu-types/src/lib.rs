@@ -1562,7 +1562,8 @@ impl TextureViewDimension {
 ///
 /// Corresponds to [WebGPU `GPUBlendFactor`](
 /// https://gpuweb.github.io/gpuweb/#enumdef-gpublendfactor).
-/// Values using S1 requires [`Features::DUAL_SOURCE_BLENDING`].
+/// Values using S1 requires [`Features::DUAL_SOURCE_BLENDING`] and can only be
+/// used with the first render target.
 #[repr(C)]
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "trace", derive(Serialize))]
@@ -1603,6 +1604,20 @@ pub enum BlendFactor {
     Src1Alpha = 15,
     /// Dual buffer alternate buffer, 1.0 - S1.alpha
     OneMinusSrc1Alpha = 16,
+}
+
+impl BlendFactor {
+    /** Distinguish if the blend source is refering to an alternate buffer (S1)
+    and require [`Features::DUAL_SOURCE_BLENDING`]. */
+    pub fn is_second_blend_source(&self) -> bool {
+        match self {
+            BlendFactor::Src1
+            | BlendFactor::OneMinusSrc1
+            | BlendFactor::Src1Alpha
+            | BlendFactor::OneMinusSrc1Alpha => true,
+            _ => false,
+        }
+    }
 }
 
 /// Alpha blend operation.

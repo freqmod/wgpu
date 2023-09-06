@@ -384,6 +384,15 @@ pub enum CreateRenderPipelineError {
     },
     #[error("In the provided shader, the type given for group {group} binding {binding} has a size of {size}. As the device does not support `DownlevelFlags::BUFFER_BINDINGS_NOT_16_BYTE_ALIGNED`, the type must have a size that is a multiple of 16 bytes.")]
     UnalignedShader { group: u32, binding: u32, size: u64 },
+    #[error("Blend factor {factor:?} using S1 target used for invalid render target {target}.")]
+    AlternateBlendSourceOnUnsupportedTarget {
+        factor: wgt::BlendFactor,
+        target: u32,
+    },
+    #[error(
+        "Blend factor {factor:?} refer second blend source, but the shader does not provide it."
+    )]
+    NonExistingSecondBlendSourceReferenced { factor: wgt::BlendFactor },
 }
 
 bitflags::bitflags! {

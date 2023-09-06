@@ -72,6 +72,7 @@ pub struct InterfaceVar {
     pub ty: NumericType,
     interpolation: Option<naga::Interpolation>,
     sampling: Option<naga::Sampling>,
+    second_blend_source: bool,
 }
 
 impl InterfaceVar {
@@ -80,6 +81,7 @@ impl InterfaceVar {
             ty: NumericType::from_vertex_format(format),
             interpolation: None,
             sampling: None,
+            second_blend_source: false,
         }
     }
 }
@@ -762,6 +764,67 @@ pub fn check_texture_format(
     }
 }
 
+/// Returns an error if the target contains a second blend source and it is not
+/// supported by the device or shader endpoint
+pub fn check_target_blend_source<'a, A: crate::hal_api::HalApi>(
+    device: &crate::device::resource::Device<A>,
+    shader: Option<&crate::pipeline::ShaderModule<A>>,
+    fragment_state: &Option<crate::pipeline::FragmentState<'a>>,
+    state: &wgt::ColorTargetState,
+    target_index: u32,
+) -> Result<(), crate::pipeline::CreateRenderPipelineError> {
+    if let Some(blend_mode) = state.blend {
+        let mut got_second_blend_source = false;
+        if device
+            .features
+            .contains(wgt::Features::DUAL_SOURCE_BLENDING)
+        {
+            if let Some(fragment_state) = fragment_state.as_ref() {
+                if let Some(interface) = shader.and_then(|shader| shader.interface.as_ref()) {
+                    if let Some(entry_point) = interface.entry_points.get(&(
+                        naga::ShaderStage::Fragment,
+                        String::from(fragment_state.stage.entry_point.as_ref()),
+                    )) {
+                        for output in entry_point.outputs.iter() {
+                            if let &Varying::Local {
+                                ref location,
+                                ref iv,
+                            } = output
+                            {
+                                if *location == 0 && iv.second_blend_source {
+                                    got_second_blend_source = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        let check_target =
+            |factor: wgt::BlendFactor| -> Result<(), crate::pipeline::CreateRenderPipelineError> {
+                if factor.is_second_blend_source() {
+                    device.require_features(wgt::Features::DUAL_SOURCE_BLENDING)?;
+                    if target_index != 0 {
+                        return Err(crate::pipeline::CreateRenderPipelineError
+                            ::AlternateBlendSourceOnUnsupportedTarget { factor, target: target_index });
+                    }
+                    if !got_second_blend_source {
+                        return Err(crate::pipeline::CreateRenderPipelineError
+                            ::NonExistingSecondBlendSourceReferenced { factor });
+                    }
+                }
+                Ok(())
+            };
+        check_target(blend_mode.color.src_factor)?;
+        check_target(blend_mode.color.dst_factor)?;
+        check_target(blend_mode.alpha.src_factor)?;
+        check_target(blend_mode.alpha.dst_factor)?;
+    }
+
+    Ok(())
+}
 pub type StageIo = FastHashMap<wgt::ShaderLocation, InterfaceVar>;
 
 impl Interface {
@@ -812,13 +875,14 @@ impl Interface {
                 location,
                 interpolation,
                 sampling,
-                second_blend_source: _,
+                second_blend_source,
             }) => Varying::Local {
                 location,
                 iv: InterfaceVar {
                     ty: numeric_ty,
                     interpolation,
                     sampling,
+                    second_blend_source,
                 },
             },
             Some(&naga::Binding::BuiltIn(built_in)) => Varying::BuiltIn(built_in),

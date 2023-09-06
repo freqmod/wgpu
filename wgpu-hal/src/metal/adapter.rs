@@ -808,7 +808,10 @@ impl super::PrivateCapabilities {
             | F::DEPTH32FLOAT_STENCIL8
             | F::MULTI_DRAW_INDIRECT;
 
-        features.set(F::DUAL_SOURCE_BLENDING, self.msl_version >= MTLLanguageVersion::V1_2);
+        features.set(
+            F::DUAL_SOURCE_BLENDING,
+            self.msl_version >= MTLLanguageVersion::V1_2,
+        );
         features.set(F::TIMESTAMP_QUERY, self.support_timestamp_query);
         // TODO: Not yet implemented.
         // features.set(
